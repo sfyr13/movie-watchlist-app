@@ -1,5 +1,5 @@
 document.getElementById("searchBtn").addEventListener("click", () => {
-    const query = document.getElementById("searchInput").value.trim();
+    const query = document.getElementById("searchInput").value.trim(); //trim whistespace when a user enters movie name (e.g. '   batman  ' -> 'batman')
     const resultsContainer = document.getElementById("results");
   
     resultsContainer.innerHTML = ""; // Clear previous
