@@ -1,24 +1,45 @@
-document.getElementById("searchBtn").addEventListener("click", () => {
-    const query = document.getElementById("searchInput").value.trim(); //trim whistespace when a user enters movie name (e.g. '   batman  ' -> 'batman')
-    const resultsContainer = document.getElementById("results");
-  
-    resultsContainer.innerHTML = ""; // Clear previous
-  
-    if (!query) return;
-  
-    // Simulate 3 dummy results
-    for (let i = 0; i < 3; i++) {
-      resultsContainer.innerHTML += `
-        <div class="col-md-4">
-          <div class="card bg-secondary text-white h-100">
-            <img src="https://via.placeholder.com/300x450" class="card-img-top" alt="Movie Poster">
-            <div class="card-body">
-              <h5 class="card-title">Movie Title ${i + 1}</h5>
-              <p class="card-text">This is a short movie description. Real API data will replace this soon.</p>
-              <a href="movie.html" class="btn btn-outline-light">Details</a>
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("searchInput");
+  const searchButton = document.getElementById("searchBtn");
+  const resultsContainer = document.getElementById("results");
+
+  searchButton.addEventListener("click", async () => {
+    const query = searchInput.value.trim();
+
+    if (!query) {
+      resultsContainer.innerHTML = "<p>Please enter a search term.</p>";
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      resultsContainer.innerHTML = ""; // Clear previous results
+
+      if (data.error) {
+        resultsContainer.innerHTML = `<p>${data.error}</p>`;
+        return;
+      }
+
+      data.movies.forEach(movie => {
+        const card = `
+          <div class="col-md-3">
+            <div class="card h-100">
+              <img src="${movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/150"}" class="card-img-top" alt="${movie.Title}">
+              <div class="card-body">
+                <h5 class="card-title">${movie.Title}</h5>
+                <p class="card-text">${movie.Year}</p>
+              </div>
             </div>
           </div>
-        </div>
-      `;
+        `;
+        resultsContainer.innerHTML += card;
+      });
+
+    } catch (error) {
+      console.error("Fetch error:", error);
+      resultsContainer.innerHTML = "<p>Something went wrong. Try again later.</p>";
     }
   });
+});
