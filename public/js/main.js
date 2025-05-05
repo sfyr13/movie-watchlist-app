@@ -12,8 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-      const data = await response.json();
+      const response = await axios.get(`/api/search`, {
+        params: {query}
+      });
+      const data = response.data;
 
       resultsContainer.innerHTML = ""; // Clear previous results
 
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Axios error:", error.message);
       resultsContainer.innerHTML = "<p>Something went wrong. Try again later.</p>";
     }
   });

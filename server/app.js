@@ -4,6 +4,7 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import axios from "axios";
 
 // Initialize the Express app and port
 const app = express();
@@ -31,9 +32,18 @@ app.get("/api/search", async (req, res) => {
 
   try {
     // Fetch data from OMDb API using your API key (stored in .env file)
-    const apiUrl = `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${encodeURIComponent(query)}`;
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    // const apiUrl = `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${encodeURIComponent(query)}`;
+    // const response = await fetch(apiUrl);
+    // const data = await response.json();
+
+    const response = await axios.get("http://www.omdbapi.com/", {
+      params : {
+        apikey: process.env.OMDB_API_KEY,
+        s: query,
+      }
+    });
+
+    const data = response.data;
 
     // If OMDb API returns an error, send that to the frontend
     if (data.Response === "False") {
@@ -43,8 +53,9 @@ app.get("/api/search", async (req, res) => {
     // Otherwise, return the list of movies to the frontend
     res.json({ movies: data.Search });
     
+
   } catch (error) {
-    console.error("Error fetching from OMDb:", error);
+    console.error("Axios error", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 });
