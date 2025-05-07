@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
         params: {query}
       });
       const data = response.data;
+      const movies = data.movies;
 
       resultsContainer.innerHTML = ""; // Clear previous results
 
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      data.movies.forEach(movie => {
+      movies.forEach(movie => {
         const card = `
           <div class="col-md-3">
             <div class="card h-100">

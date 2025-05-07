@@ -93,6 +93,17 @@ app.post("/api/watchlist", async (req, res) => {
   }
 });
 
+// GET watchlist from the database
+app.get("/api/watchlist", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM watchlist ORDER BY title ASC");
+    res.json({ movies: result.rows });
+  } catch (err) {
+    console.error("DB error:", err.message);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
