@@ -25,24 +25,51 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      movies.forEach(movie => {
-        const card = `
-          <div class="col-md-3">
-            <div class="card h-100">
-              <img src="${movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/150"}" class="card-img-top" alt="${movie.Title}">
-              <div class="card-body">
-                <h5 class="card-title">${movie.Title}</h5>
-                <p class="card-text">${movie.Year}</p>
-              </div>
+      movies.forEach((movie) => {
+        const col = document.createElement("div");
+        col.className = "col-md-3";
+        col.innerHTML = `
+          <div class="card h-100">
+            <img src="${movie.Poster}" class="card-img-top" alt="${movie.Title}">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${movie.Title}</h5>
+              <p class="card-text">${movie.Year}</p>
+              <button class="btn btn-success btn-sm mt-auto add-btn"
+                data-id="${movie.imdbID}"
+                data-title="${movie.Title}"
+                data-year="${movie.Year}"
+                data-poster="${movie.Poster}">
+                ➕ Add to Watchlist
+              </button>
             </div>
           </div>
         `;
-        resultsContainer.innerHTML += card;
+        resultsContainer.appendChild(col);
       });
 
-    } catch (error) {
-      console.error("Axios error:", error.message);
-      resultsContainer.innerHTML = "<p>Something went wrong. Try again later.</p>";
+      // Attach click handlers to all new "Add to Watchlist" buttons
+      document.querySelectorAll(".add-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const { id, title, year, poster } = e.target.dataset;
+
+          try {
+            const response = await axios.post("/api/watchlist", {
+              imdbID: id,
+              title,
+              year,
+              poster,
+            });
+
+            alert(response.data.message);
+          } catch (err) {
+            console.error("Failed to add to watchlist:", err.message);
+            alert("Could not add to watchlist.");
+          }
+        });
+      });
+    } catch (err) {
+      console.error("Search failed:", err.message);
+      resultsContainer.innerHTML = "<p>Error fetching movies.</p>";
     }
   });
 });
