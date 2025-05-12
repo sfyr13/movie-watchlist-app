@@ -104,6 +104,27 @@ app.get("/api/watchlist", async (req, res) => {
   }
 });
 
+// ✅ DELETE route to remove a movie from watchlist
+app.delete("/api/watchlist/:imdbID", async (req, res) => {
+  const { imdbID } = req.params;
+  if (!imdbID) {
+    return res.status(400).json({ error: "Missing IMDb ID" });
+  }
+
+  try {
+    const result = await pool.query("DELETE FROM watchlist WHERE imdb_id = $1 RETURNING *", [imdbID]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Movie not found in watchlist" });
+    }
+
+    res.json({ message: "Movie removed from watchlist", movie: result.rows[0] });
+  } catch (err) {
+    console.error("DB error:", err.message);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
